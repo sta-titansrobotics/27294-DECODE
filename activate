@@ -4,3 +4,8 @@ export ANDROID_HOME="${ANDROID_HOME:=$HOME/Desktop/android-sdk/}"
 export PS1="(env) $PS1"
 export PATH="$PATH:$JAVA_HOME/bin"
 export PATH="$PATH:$ANDROID_HOME/platform-tools"
+
+export PROJECT_DIRECTORY="$(git rev-parse --show-toplevel)"
+
+alias install="$PROJECT_DIRECTORY/gradlew installRelease"
+alias uninstall="$PROJECT_DIRECTORY/gradlew uninstallRelease"
