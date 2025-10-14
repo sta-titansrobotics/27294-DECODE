@@ -1,0 +1,10 @@
+To upload your newly profound code into the Control Hub.
+Ensure that you have connected the Control Hub to your computer
+    Connect the USB-C port on the Control Hub to your computer
+Open your integrated terminal and verify that the device is connected using `adb devices`
+    If the adb command is not found try running `source activate` then run the command again
+    If it fails please open a issue with some information that I can actually work with
+        eg. list your environmental variables, provide your jdk/android-sdk path, etc
+Run ./gradlew :TeamCode:installRelease
+    Optionally if you have the gradle extension installed you can find the task under
+    27294-DECODE > TeamCode > Tasks > install > installRelease

@@ -1,0 +1,9 @@
+// allows access to the Control Hub webpage without switching network connections
+// ensure that you have the control hub listed as a device in adb (check using adb devices)
+// you can access the page at localhost:8080
+adb forward tcp:8080 tcp:8080
+
+// if you have both the driver hub and control hub connected to the computer
+// you can disconnect the driver hub using this command, substituting <device name> for its identifier
+// it is listed under `adb devices`
+adb disconnect <device name>
