@@ -1,0 +1,30 @@
+Before you open vscode, ensure that the environmental variables ANDROID_HOME and JAVA_HOME are set
+If you are unable to set these environmental varaibles (possibly due to a lack of adminstrative rights over your current system)
+Try the following:
+    On Windows:
+        Set your environmental variables for your LOCAL ACCOUNT (going to the search bar and find the result `Edit environment variables for your account`)
+        Close vscode, reopen then clean the workspace (Command Palette > Java: Clean Java Language Server Workspace)
+            If the libraries are still not being referenced by vscode open up the integrated terminal (default Ctrl+`)
+            Then run ./gradlew clean build (assuming the terminal puts you into the project root directory)
+            After the command "BUILD SUCCESSFUL", clean the workspace again and it should work (hopefully)
+    On MacOS:
+        1. Open your terminal
+        2. Run the following commands, subsituting as nessesary
+            launchctl setenv ANDROID_HOME path_to_installation
+            launchctl setenv JAVA_HOME path_to_installation(should end with `Home/` if you extaracted the jdk)
+
+            PLEASE USE ABSOLUTE PATH (dont use ~/ or ./)
+        3. Ensure that you completely close vscode (should not be available in your dock (taskbar of windows))
+        4. Reopen vscode and clean the workspace (Command Palette > Java: Clean Java Language Server Workspace)
+            If the libraries are still not being referenced by vscode open up the integrated terminal (default Meta+`)
+            Then run ./gradlew clean build (assuming the terminal puts you into the project root directory)
+            After the command "BUILD SUCCESSFUL", clean the workspace again and it should work (hopefully)
+
+If there is an error saying that it cannot find StringConcatFactory
+    1. Set the JDK Runtime in the Project Settings
+        Ctrl + Shift + P (open the command palette) > Java: Configure Java Runtime
+
+    OR
+
+    2. add org.gradle.java.home=<jdk installation path> to gradle.properties
+        DO NOT PUSH THIS CHANGE TO THE REPOSITORY
