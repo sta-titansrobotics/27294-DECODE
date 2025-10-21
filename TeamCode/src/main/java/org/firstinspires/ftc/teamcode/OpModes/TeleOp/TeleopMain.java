@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
+package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@Autonomous
-public class Main extends LinearOpMode {
+@TeleOp
+public class TeleopMain extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData("testing", "it works");
