@@ -60,7 +60,7 @@ public class DriveTest extends LinearOpMode {
                 this.launchControl.disableLauncher();
             }
 
-            if (this.gamepad1.left_bumper) {
+            if (this.gamepad1.right_trigger > 0.2f) {
                 this.launchControl.setFeederPower(1);
             } else {
                 this.launchControl.setFeederPower(0);

@@ -12,7 +12,7 @@ public class ManualLaunchControl {
         this.launcher = launcher;
 
         feeder.setDirection(Direction.REVERSE);
-        launcher.setDirection(Direction.FORWARD);
+        launcher.setDirection(Direction.REVERSE);
     }
 
     public void enableLauncher() {
