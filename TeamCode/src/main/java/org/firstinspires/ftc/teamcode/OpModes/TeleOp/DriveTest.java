@@ -42,15 +42,18 @@ public class DriveTest extends LinearOpMode {
         while (opModeIsActive()) {
             // note: gamepad values are from -1 to 1
 
-            float rotationalOffset = this.gamepad1.left_stick_x; // left is -1 and right is 1
+            
+            float rotationalOffset = this.gamepad1.right_stick_x; // left is -1 and right is 1
             float forwardPower = -this.gamepad1.left_stick_y;  // according to ftc docs, without negating the value; 1 is down -1 is up
 
             if (forwardPower == 0) { // stationary rotation
                 this.drivechain.setPower(rotationalOffset, -rotationalOffset);
             } else { // forward movement with optional rotation (while driving)
+                if (forwardPower < 0) rotationalOffset = -rotationalOffset;
+
                 this.drivechain.setPower(
-                    rotationalOffset < 0 ? forwardPower + rotationalOffset : forwardPower,
-                    rotationalOffset > 0 ? forwardPower - rotationalOffset : forwardPower
+                    forwardPower + rotationalOffset,
+                    forwardPower - rotationalOffset 
                 );
             }
 

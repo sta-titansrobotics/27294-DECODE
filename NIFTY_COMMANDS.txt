@@ -7,3 +7,6 @@ adb forward tcp:8080 tcp:8080
 // you can disconnect the driver hub using this command, substituting <device name> for its identifier
 // it is listed under `adb devices`
 adb disconnect <device name>
+
+// Assuming you are connected to the REV Control Hub via its network, use the command below to connect it via adb
+adb connect 192.168.43.1:5555
