@@ -7,13 +7,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 public class DriveTest extends LinearOpMode {
     public Drivechain4WD drivechain;
-    public ManualLaunchControl launchControl;
+    public ManualLaunchControl launchControls;
     public CRServo agitator;
+
+    public double agitatorPower = 1;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -24,7 +25,7 @@ public class DriveTest extends LinearOpMode {
             hardwareMap.get(DcMotor.class, "backRight")
         );
 
-        this.launchControl = new ManualLaunchControl(
+        this.launchControls = new ManualLaunchControl(
             hardwareMap.get(DcMotor.class, "feederMotor"),
             hardwareMap.get(DcMotor.class, "launchMotor")
         );
@@ -39,36 +40,49 @@ public class DriveTest extends LinearOpMode {
 
         waitForStart();
 
+        this.gamepad1.backWasPressed();
+
         while (opModeIsActive()) {
             // note: gamepad values are from -1 to 1
-
-            float rotationalOffset = this.gamepad1.left_stick_x; // left is -1 and right is 1
+            
+            float rotationalOffset = this.gamepad1.right_stick_x; // left is -1 and right is 1
             float forwardPower = -this.gamepad1.left_stick_y;  // according to ftc docs, without negating the value; 1 is down -1 is up
 
             if (forwardPower == 0) { // stationary rotation
                 this.drivechain.setPower(rotationalOffset, -rotationalOffset);
             } else { // forward movement with optional rotation (while driving)
+                if (forwardPower < 0) rotationalOffset = -rotationalOffset;
+
                 this.drivechain.setPower(
-                    rotationalOffset < 0 ? forwardPower + rotationalOffset : forwardPower,
-                    rotationalOffset > 0 ? forwardPower - rotationalOffset : forwardPower
+                    forwardPower + rotationalOffset,
+                    forwardPower - rotationalOffset 
                 );
             }
 
-            if (this.gamepad1.left_trigger > 0.2f) {
-                this.launchControl.enableLauncher();
+            if (this.gamepad1.left_trigger > 0.2f) { // launch
+                this.launchControls.enableLauncher();
             } else {
-                this.launchControl.disableLauncher();
+                this.launchControls.disableLauncher();
             }
 
-            if (this.gamepad1.right_trigger > 0.2f) {
-                this.launchControl.setFeederPower(1);
+            if (this.gamepad1.right_trigger > 0.2f) { // feeder
+                this.launchControls.setFeederPower(1);
             } else {
-                this.launchControl.setFeederPower(0);
+                this.launchControls.setFeederPower(0);
             }
 
-            this.agitator.setPower(1);
+            if (this.gamepad1.backWasPressed()) { // disabling of agitator because artefact gets stuck
+                this.agitatorPower = this.agitatorPower == 1 ? 0 : 1;
+            }
+
+            this.agitator.setPower(this.agitatorPower);
 
             telemetry.addData("status", "running");
+            telemetry.addData("Back Button", "enable/disable of agitator");
+            telemetry.addData("Left Trigger", "Launch Motor");
+            telemetry.addData("Right Trigger", "Feeder Motor");
+            telemetry.addData("Left Joystick", "forward and back");
+            telemetry.addData("Right Joystick", "rotation left and right respectively");
             telemetry.update();
         }
 
