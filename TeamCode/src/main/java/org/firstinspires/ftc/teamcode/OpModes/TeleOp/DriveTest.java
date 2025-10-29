@@ -14,8 +14,6 @@ public class DriveTest extends LinearOpMode {
     public ManualLaunchControl launchControls;
     public CRServo agitator;
 
-    public double agitatorPower = 1;
-
     @Override
     public void runOpMode() throws InterruptedException {
         this.drivechain = new Drivechain4WD(
@@ -39,8 +37,6 @@ public class DriveTest extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
-
-        this.gamepad1.backWasPressed();
 
         while (opModeIsActive()) {
             // note: gamepad values are from -1 to 1
@@ -71,14 +67,10 @@ public class DriveTest extends LinearOpMode {
                 this.launchControls.setFeederPower(0);
             }
 
-            if (this.gamepad1.backWasPressed()) { // disabling of agitator because artefact gets stuck
-                this.agitatorPower = this.agitatorPower == 1 ? 0 : 1;
-            }
-
-            this.agitator.setPower(this.agitatorPower);
+            this.agitator.setPower(this.gamepad1.a ? -1 : 1);
 
             telemetry.addData("status", "running");
-            telemetry.addData("Back Button", "enable/disable of agitator");
+            telemetry.addData("A", "hold to reverse direction of agitator");
             telemetry.addData("Left Trigger", "Launch Motor");
             telemetry.addData("Right Trigger", "Feeder Motor");
             telemetry.addData("Left Joystick", "forward and back");
