@@ -70,7 +70,7 @@ public class AprilTagController {
         for (AprilTagDetection detection : this.tagProcessor.getDetections()) {
             if (detection.id == targetID) return detection;
         }
-        
+
         return null;
     }
 }

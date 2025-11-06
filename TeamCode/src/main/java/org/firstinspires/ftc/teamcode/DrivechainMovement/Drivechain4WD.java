@@ -47,4 +47,16 @@ public class Drivechain4WD {
         this.setLeftPower(leftSide);
         this.setRightPower(rightSide);
     }
+
+    /**
+     * moves the bot horizontally without rotating
+     * ie. if it is looking forward, it can move left to right without rotating its angle
+     * @param power - negative power moves it to the right and positive to the left
+     */
+    public void setSideManouverPower(int power) {
+        this.frontLeft.setPower(power);     // needs to move forward to go right
+        this.frontRight.setPower(-power);   // needs to move back to go right
+        this.backLeft.setPower(-power);     // needs to move back to go right
+        this.backRight.setPower(power);     // needs to move forward to go right
+    }
 }
