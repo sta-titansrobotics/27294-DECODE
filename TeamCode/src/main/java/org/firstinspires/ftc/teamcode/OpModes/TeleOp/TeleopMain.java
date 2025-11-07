@@ -45,16 +45,10 @@ public class TeleopMain extends LinearOpMode {
             float rotationalOffset = this.gamepad1.right_stick_x; // left is -1 and right is 1
             float forwardPower = -this.gamepad1.left_stick_y;  // according to ftc docs, without negating the value; 1 is down -1 is up
 
-            if (this.gamepad1.dpad_down || this.gamepad1.dpad_up || this.gamepad1.dpad_left || this.gamepad1.dpad_right) { // dpad movement
-                int frontLeftPow = (this.gamepad1.dpad_right && this.gamepad1.dpad_up) ? 1 : -1;    // RightDown is always forward, rest is forward
-                int backLeftPow = (this.gamepad1.dpad_right && this.gamepad1.dpad_down) ? -1 : 1;   // RightDown is always forward, rest is forward
-                int frontRightPow = (this.gamepad1.dpad_left && this.gamepad1.dpad_up) ? 1 : -1;    // LeftUp is always forward, rest is forward
-                int backRightPow = (this.gamepad1.dpad_left && this.gamepad1.dpad_down) ? -1 : 1;   // LeftDown is always back, rest is forward
-
-                this.drivechain.frontLeft.setPower(frontLeftPow);
-                this.drivechain.backLeft.setPower(backLeftPow);
-                this.drivechain.frontRight.setPower(frontRightPow);
-                this.drivechain.backRight.setPower(backRightPow);
+            if (this.gamepad1.dpad_down || this.gamepad1.dpad_up) { // dpad movement fwd and bk
+                this.drivechain.setPower(this.gamepad1.dpad_up ? 1 : -1);
+            } else if (this.gamepad1.dpad_left || this.gamepad1.dpad_right) { // dpad movement side to side
+                this.drivechain.setSideManouverPower(this.gamepad1.dpad_right ? 1 : -1);
             } else if (forwardPower == 0) { // stationary rotation
                 this.drivechain.setPower(rotationalOffset, -rotationalOffset);
             } else { // forward movement with optional rotation (while driving)
