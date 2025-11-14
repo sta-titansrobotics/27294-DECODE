@@ -15,12 +15,8 @@ public class ManualLaunchControl {
         launcher.setDirection(Direction.REVERSE);
     }
 
-    public void enableLauncher() {
-        this.launcher.setPower(1);
-    }
-
-    public void disableLauncher() {
-        this.launcher.setPower(0);
+    public void setEnableLauncher(boolean should) {
+        this.launcher.setPower(should ? 1 : 0);
     }
 
     public void setFeederPower(double pow) {

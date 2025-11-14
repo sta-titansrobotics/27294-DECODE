@@ -53,7 +53,7 @@ public class Drivechain4WD {
      * ie. if it is looking forward, it can move left to right without rotating its angle
      * @param power - negative power moves it to the left and positive to the right
      */
-    public void setSideManouverPower(int power) {
+    public void setSideManouverPower(float power) {
         this.frontLeft.setPower(power);     // needs to move forward to go right
         this.frontRight.setPower(-power);   // needs to move back to go right
         this.backLeft.setPower(-power);     // needs to move back to go right

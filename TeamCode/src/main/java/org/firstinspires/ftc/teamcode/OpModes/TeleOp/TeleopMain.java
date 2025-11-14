@@ -45,8 +45,16 @@ public class TeleopMain extends LinearOpMode {
             float rotationalOffset = this.gamepad1.right_stick_x; // left is -1 and right is 1
             float forwardPower = -this.gamepad1.left_stick_y;  // according to ftc docs, without negating the value; 1 is down -1 is up
 
-            if (this.gamepad1.dpad_down || this.gamepad1.dpad_up) { // dpad movement fwd and bk
-                this.drivechain.setPower(this.gamepad1.dpad_up ? 1 : -1);
+            if (this.gamepad1.dpad_up) { // dpad movement fwd and bk
+                this.drivechain.frontLeft.setPower(this.gamepad1.dpad_left ? 0 : 1);
+                this.drivechain.frontRight.setPower(this.gamepad1.dpad_right ? 0 : 1);
+                this.drivechain.backLeft.setPower(this.gamepad1.dpad_right ? 0 : 1);
+                this.drivechain.backRight.setPower(this.gamepad1.dpad_left ? 0 : 1);
+            } else if (this.gamepad1.dpad_down) {
+                this.drivechain.frontLeft.setPower(this.gamepad1.dpad_right ? 0 : -1);
+                this.drivechain.frontRight.setPower(this.gamepad1.dpad_left ? 0 : -1);
+                this.drivechain.backLeft.setPower(this.gamepad1.dpad_left ? 0 : -1);
+                this.drivechain.backRight.setPower(this.gamepad1.dpad_right ? 0 : -1);
             } else if (this.gamepad1.dpad_left || this.gamepad1.dpad_right) { // dpad movement side to side
                 this.drivechain.setSideManouverPower(this.gamepad1.dpad_right ? 1 : -1);
             } else if (forwardPower == 0) { // stationary rotation
@@ -60,18 +68,8 @@ public class TeleopMain extends LinearOpMode {
                 );
             }
 
-            if (this.gamepad1.left_trigger > 0.2f) { // launch
-                this.launchControls.enableLauncher();
-            } else {
-                this.launchControls.disableLauncher();
-            }
-
-            if (this.gamepad1.right_trigger > 0.2f) { // feeder
-                this.launchControls.setFeederPower(1);
-            } else {
-                this.launchControls.setFeederPower(0);
-            }
-
+            this.launchControls.setEnableLauncher(this.gamepad1.left_trigger > 0.2f);
+            this.launchControls.setFeederPower(this.gamepad1.right_trigger > 0.2f ? 1 : 0);
             this.agitator.setPower(this.gamepad1.a ? -1 : 1);
 
             telemetry.addData("status", "running");

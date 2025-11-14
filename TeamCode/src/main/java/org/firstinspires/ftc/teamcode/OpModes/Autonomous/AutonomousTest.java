@@ -55,7 +55,7 @@ public class AutonomousTest extends LinearOpMode {
                     this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
                     break;
                 case REV_LAUNCH_MOTOR:
-                    this.launchControl.enableLauncher();
+                    this.launchControl.setEnableLauncher(true);
                     if (getRuntime() >= this.timeoutUntil) { // waited enough
                         this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
                         this.timeoutUntil = getRuntime() + 10000; // 10000 ms = 10s
