@@ -52,7 +52,8 @@ public class MotorAnalysis extends LinearOpMode {
             for (DcMotor motor : motors.keySet()) {
                 int lastPos = 0;
                 double lastTime = getRuntime();
-                int rpm = 0;
+
+                double ticksPerRev = motor.getMotorType().getTicksPerRev();
 
                 while (opModeIsActive()) {
                     if (this.gamepad1.dpadRightWasPressed()) {
@@ -65,25 +66,25 @@ public class MotorAnalysis extends LinearOpMode {
     
                     motor.setPower(motorPower);
 
-                    if (motorPower != 0 && getRuntime() - lastTime >= 1d) {
-                        lastTime = getRuntime();
-                        rpm = motor.getCurrentPosition() - lastPos;
+                    double rounds = ((double)(motor.getCurrentPosition() - lastPos) / ticksPerRev)
+                        / (getRuntime() - lastTime);
 
-                        lastPos = motor.getCurrentPosition();
-                        motor.getMotorType().getTicksPerRev();
-                    }
-    
                     telemetry.addData("Currently Inspecting", motor.getMotorType().getName());
                     telemetry.addData("Name", motors.get(motor));
                     telemetry.addData("Tracked Power", motorPower);
                     telemetry.addData("Reported Power", motor.getPower());
                     telemetry.addData("Max RPM", motor.getMotorType().getMaxRPM());
-                    telemetry.addData("Position Difference Since Last", rpm);
+                    telemetry.addData("RPM Calculations", (
+                        rounds > 0 ? 60 / rounds : 0
+                    ));
                     telemetry.addData("Detectable Motors", motors.size());
                     telemetry.addData("---", "---");
                     telemetry.addData("Right Bumper", "Next Motor");
                     telemetry.addData("DPad Left and Right", "decrease/increase power respectivly by 0.1");
                     telemetry.update();
+
+                    lastTime = getRuntime();
+                    lastPos = motor.getCurrentPosition();
 
                     lastPos = motor.getCurrentPosition();
                 }

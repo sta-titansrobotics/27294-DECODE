@@ -11,13 +11,13 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp
 public class TeleopMain extends LinearOpMode {
-    public Drivechain4WD drivechain;
+    public Drivechain4WD<DcMotor> drivechain;
     public ManualLaunchControl launchControls;
     public CRServo agitator;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        this.drivechain = new Drivechain4WD(
+        this.drivechain = new Drivechain4WD<>(
             hardwareMap.get(DcMotor.class, "frontLeft"),
             hardwareMap.get(DcMotor.class, "frontRight"),
             hardwareMap.get(DcMotor.class, "backLeft"),

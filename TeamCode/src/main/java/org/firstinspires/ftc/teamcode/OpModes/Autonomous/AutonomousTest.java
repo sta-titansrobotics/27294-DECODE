@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 @Autonomous
 public class AutonomousTest extends LinearOpMode {
     public AprilTagController aprilTagProcess;
-    public Drivechain4WD drivechain;
+    public Drivechain4WD<DcMotor> drivechain;
     public ManualLaunchControl launchControl;
 
     public Procedures currentProcedure = Procedures.NAVIGATE_TO_PIT;
@@ -25,7 +25,7 @@ public class AutonomousTest extends LinearOpMode {
             this
         );
 
-        this.drivechain = new Drivechain4WD(
+        this.drivechain = new Drivechain4WD<>(
             hardwareMap.get(DcMotor.class, "frontLeft"),
             hardwareMap.get(DcMotor.class, "frontRight"),
             hardwareMap.get(DcMotor.class, "backLeft"),

@@ -8,11 +8,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous
 public class AutonomousMainR extends LinearOpMode {
-    public Drivechain4WD drivechain;
+    public Drivechain4WD<DcMotor> drivechain;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        this.drivechain = new Drivechain4WD(
+        this.drivechain = new Drivechain4WD<DcMotor>(
             hardwareMap.get(DcMotor.class, "frontLeft"),
             hardwareMap.get(DcMotor.class, "frontRight"),
             hardwareMap.get(DcMotor.class, "backLeft"),
