@@ -52,7 +52,6 @@ public class MotorAnalysis extends LinearOpMode {
             for (DcMotor motor : motors.keySet()) {
                 int lastPos = 0;
                 double lastTime = getRuntime();
-
                 double ticksPerRev = motor.getMotorType().getTicksPerRev();
 
                 while (opModeIsActive()) {
@@ -66,8 +65,8 @@ public class MotorAnalysis extends LinearOpMode {
     
                     motor.setPower(motorPower);
 
-                    double rounds = ((double)(motor.getCurrentPosition() - lastPos) / ticksPerRev)
-                        / (getRuntime() - lastTime);
+                    double timeSinceLast = getRuntime() - lastTime;
+                    double ticksPerMinute = ((double)(motor.getCurrentPosition() - lastPos)) * (60 / timeSinceLast);
 
                     telemetry.addData("Currently Inspecting", motor.getMotorType().getName());
                     telemetry.addData("Name", motors.get(motor));
@@ -75,7 +74,7 @@ public class MotorAnalysis extends LinearOpMode {
                     telemetry.addData("Reported Power", motor.getPower());
                     telemetry.addData("Max RPM", motor.getMotorType().getMaxRPM());
                     telemetry.addData("RPM Calculations", (
-                        rounds > 0 ? 60 / rounds : 0
+                        ticksPerMinute / ticksPerRev
                     ));
                     telemetry.addData("Detectable Motors", motors.size());
                     telemetry.addData("---", "---");
@@ -86,7 +85,7 @@ public class MotorAnalysis extends LinearOpMode {
                     lastTime = getRuntime();
                     lastPos = motor.getCurrentPosition();
 
-                    lastPos = motor.getCurrentPosition();
+                    sleep(50);
                 }
 
                 motor.setPower(0);
