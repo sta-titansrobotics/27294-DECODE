@@ -4,6 +4,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.AprilTag.AprilTagController;
 import org.firstinspires.ftc.teamcode.DrivechainMovement.Drivechain4WD;
 import org.firstinspires.ftc.teamcode.LaunchMechanism.ManualLaunchControl;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -25,17 +26,17 @@ public class AutonomousTest extends LinearOpMode {
             this
         );
 
-        this.drivechain = new Drivechain4WD<>(
-            hardwareMap.get(DcMotor.class, "frontLeft"),
-            hardwareMap.get(DcMotor.class, "frontRight"),
-            hardwareMap.get(DcMotor.class, "backLeft"),
-            hardwareMap.get(DcMotor.class, "backRight")
-        );
+        // this.drivechain = new Drivechain4WD<>(
+        //     hardwareMap.get(DcMotor.class, "frontLeft"),
+        //     hardwareMap.get(DcMotor.class, "frontRight"),
+        //     hardwareMap.get(DcMotor.class, "backLeft"),
+        //     hardwareMap.get(DcMotor.class, "backRight")
+        // );
 
-        this.launchControl = new ManualLaunchControl(
-            hardwareMap.get(DcMotor.class, "feederMotor"),
-            hardwareMap.get(DcMotor.class, "launchMotor")
-        );
+        // this.launchControl = new ManualLaunchControl(
+        //     hardwareMap.get(DcMotor.class, "feederMotor"),
+        //     hardwareMap.get(DcMotor.class, "launchMotor")
+        // );
 
         telemetry.addData("status", "awaiting start");
         telemetry.update();
@@ -43,32 +44,37 @@ public class AutonomousTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            switch (this.currentProcedure) {
-                case NAVIGATE_TO_PIT: // TODO
-                    break;
-                case WAIT: // always goes to NAVIGATE_TO_GOAL as this is a grace period for team to load artefacts TODO
-                    if (getRuntime() <= this.timeoutUntil) continue;
-
-                    this.currentProcedure = Procedures.NAVIGATE_TO_GOAL;
-                    break;
-                case NAVIGATE_TO_GOAL: // TODO
-                    this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
-                    break;
-                case REV_LAUNCH_MOTOR:
-                    this.launchControl.setEnableLauncher(true);
-                    if (getRuntime() >= this.timeoutUntil) { // waited enough
-                        this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
-                        this.timeoutUntil = getRuntime() + 10000; // 10000 ms = 10s
-                    }
-                    break;
-                case LAUNCH_ARTEFACTS:
-                    this.launchControl.setFeederPower(1);
-                    if (getRuntime() >= this.timeoutUntil) { // waited enough
-                        this.currentProcedure = Procedures.NAVIGATE_TO_PIT;
-                    }
-                    
-                    break;
+            for (AprilTagDetection detection : this.aprilTagProcess.getDetections()) {
+                telemetry.addData("Detection", detection.id);
+                telemetry.update();
+                break;
             }
+            // switch (this.currentProcedure) {
+            //     case NAVIGATE_TO_PIT: // TODO
+            //         break;
+            //     case WAIT: // always goes to NAVIGATE_TO_GOAL as this is a grace period for team to load artefacts TODO
+            //         if (getRuntime() <= this.timeoutUntil) continue;
+
+            //         this.currentProcedure = Procedures.NAVIGATE_TO_GOAL;
+            //         break;
+            //     case NAVIGATE_TO_GOAL: // TODO
+            //         this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
+            //         break;
+            //     case REV_LAUNCH_MOTOR:
+            //         this.launchControl.setEnableLauncher(true);
+            //         if (getRuntime() >= this.timeoutUntil) { // waited enough
+            //             this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
+            //             this.timeoutUntil = getRuntime() + 10000; // 10000 ms = 10s
+            //         }
+            //         break;
+            //     case LAUNCH_ARTEFACTS:
+            //         this.launchControl.setFeederPower(1);
+            //         if (getRuntime() >= this.timeoutUntil) { // waited enough
+            //             this.currentProcedure = Procedures.NAVIGATE_TO_PIT;
+            //         }
+                    
+            //         break;
+            // }
         }
     }
 
@@ -87,7 +93,7 @@ enum Procedures {
     LAUNCH_ARTEFACTS
 }
 
-class TagIDS {
+class TagID {
     public static final int BLUE_GOAL = 20;
     public static final int RED_GOAL = 24;
 

@@ -16,10 +16,9 @@ public class MotorAnalysis extends LinearOpMode {
     @SuppressWarnings("unchecked") // in try/catch; unless they changed the code this is *probably* not an issue
     @Override
     public void runOpMode() throws InterruptedException {
-        Class<HardwareMap> cls = HardwareMap.class;
         Field declared;
         try {
-            declared = cls.getDeclaredField("allDevicesMap");
+            declared = HardwareMap.class.getDeclaredField("allDevicesMap");
             declared.setAccessible(true);
         } catch (NoSuchFieldException e) {
             throw new InterruptedException("allDeviceMap does not exist on hardwareMap, reinspect the code pls");
@@ -36,8 +35,7 @@ public class MotorAnalysis extends LinearOpMode {
         final HashMap<DcMotor, String> motors = new HashMap<>();
         deviceMapping.forEach((name, list) -> {
             for (HardwareDevice device : list) {
-                if (!(device instanceof DcMotor)) continue;
-                motors.put((DcMotor) device, name);
+                if (device instanceof DcMotor) motors.put((DcMotor) device, name);
             }
         });
 
@@ -84,8 +82,6 @@ public class MotorAnalysis extends LinearOpMode {
 
                     lastTime = getRuntime();
                     lastPos = motor.getCurrentPosition();
-
-                    sleep(50);
                 }
 
                 motor.setPower(0);
