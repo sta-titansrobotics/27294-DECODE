@@ -21,7 +21,8 @@ public class AprilTagController {
     public final LinearOpMode mainClass;
 
     private AprilTagController(VisionPortal.Builder builder, LinearOpMode mainClass) {
-        this.tagProcessor = new AprilTagProcessor.Builder().build();
+        this.tagProcessor = new AprilTagProcessor.Builder()
+            .build();
         this.videoFeed = builder.addProcessor(this.tagProcessor).build();
         this.mainClass = mainClass;
     }

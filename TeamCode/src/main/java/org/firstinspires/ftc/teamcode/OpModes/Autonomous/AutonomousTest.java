@@ -103,7 +103,10 @@ public class AutonomousTest extends LinearOpMode {
 
                     AprilTagDetection detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
                     if (detection != null) {
-                        telemetry.addData("hamming", detection.hamming);
+                        double precisionValue = detection.ftcPose.range; // TODO
+
+                        telemetry.addData("bearing", detection.ftcPose.bearing);
+                        telemetry.addData("distance", detection.ftcPose.range);
                         telemetry.update();
                     } else { // TODO: ask the builders if we can make the camera rotate lol
                         
@@ -143,4 +146,7 @@ class TagID {
     public static final int GPP_OBLISK = 21;
     public static final int PGP_OBLISK = 22;
     public static final int PPG_OBLISK = 23;
+}
+
+class Configuration {
 }
