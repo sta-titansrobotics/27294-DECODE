@@ -4,17 +4,24 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.AprilTag.AprilTagController;
 import org.firstinspires.ftc.teamcode.DrivechainMovement.Drivechain4WD;
 import org.firstinspires.ftc.teamcode.LaunchMechanism.ManualLaunchControl;
+import org.firstinspires.ftc.vision.VisionPortal.StreamFormat;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import android.util.Size;
 
 @Autonomous
 public class AutonomousTest extends LinearOpMode {
     public AprilTagController aprilTagProcess;
     public Drivechain4WD<DcMotor> drivechain;
     public ManualLaunchControl launchControl;
+    public ColorSensor color;
 
     public Procedures currentProcedure = Procedures.NAVIGATE_TO_LAUNCHZONE; // assuming that at the start of auto we already have artefacts loaded, so we can navigate to a launchzone
     public double timeoutUntil = 0;
@@ -28,15 +35,21 @@ public class AutonomousTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         this.aprilTagProcess = new AprilTagController(
             hardwareMap.get(WebcamName.class, "camera"),
-            this
+            builder -> builder.setCameraResolution(new Size(1280, 720))
+                        .setStreamFormat(StreamFormat.MJPEG),
+            this,
+            new AprilTagProcessor.Builder()
+                .build()
         );
 
-        // this.drivechain = new Drivechain4WD<>(
-        //     hardwareMap.get(DcMotor.class, "frontLeft"),
-        //     hardwareMap.get(DcMotor.class, "frontRight"),
-        //     hardwareMap.get(DcMotor.class, "backLeft"),
-        //     hardwareMap.get(DcMotor.class, "backRight")
-        // );
+        this.color = hardwareMap.get(ColorSensor.class, "color");
+
+        this.drivechain = new Drivechain4WD<>(
+            hardwareMap.get(DcMotor.class, "frontLeft"),
+            hardwareMap.get(DcMotor.class, "frontRight"),
+            hardwareMap.get(DcMotor.class, "backLeft"),
+            hardwareMap.get(DcMotor.class, "backRight")
+        );
 
         // this.launchControl = new ManualLaunchControl(
         //     hardwareMap.get(DcMotor.class, "feederMotor"),
@@ -79,8 +92,6 @@ public class AutonomousTest extends LinearOpMode {
         }
         
 
-
-
         // by default when the driver has not properly setup the configuration, the program will automatically assume blue team and GPP motif
         while (opModeIsActive()) {
             // TODO check if in launchzone using color sensors
@@ -94,16 +105,20 @@ public class AutonomousTest extends LinearOpMode {
                     this.currentProcedure = Procedures.NAVIGATE_TO_LAUNCHZONE;
                     break;
                 case NAVIGATE_TO_LAUNCHZONE: // TODO
-                    if (this.inLaunchZone) {
-                        this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
-                        break;
-                    }
+                    // if (this.inLaunchZone) {
+                    //     this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
+                    //     break;
+                    // }
 
                     // TODO: navigation to launchzone implementation
 
                     AprilTagDetection detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
                     if (detection != null) {
-                        double precisionValue = detection.ftcPose.range; // TODO
+                        AprilTagPoseFtc pose = detection.ftcPose;
+
+                        if (Math.abs(pose.bearing) > 2) {
+                            drivechain.setSideManouverPower(pose.bearing > 0 ? -0.4f : 0.4f);
+                        } else drivechain.setPower(0);
 
                         telemetry.addData("bearing", detection.ftcPose.bearing);
                         telemetry.addData("distance", detection.ftcPose.range);

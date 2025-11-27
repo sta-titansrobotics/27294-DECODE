@@ -6,6 +6,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.teamcode.interfaces.CameraConfigurationFunction;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -20,18 +21,18 @@ public class AprilTagController {
 
     public final LinearOpMode mainClass;
 
-    private AprilTagController(VisionPortal.Builder builder, LinearOpMode mainClass) {
-        this.tagProcessor = new AprilTagProcessor.Builder()
-            .build();
+    private AprilTagController(VisionPortal.Builder builder, LinearOpMode mainClass, AprilTagProcessor apriltagProcessor) {
+        this.tagProcessor = apriltagProcessor;
         this.videoFeed = builder.addProcessor(this.tagProcessor).build();
         this.mainClass = mainClass;
     }
 
-    public AprilTagController(WebcamName externalCamera, LinearOpMode mainClass) {
-        this(new VisionPortal.Builder().setCamera(externalCamera), mainClass);
+    public AprilTagController(WebcamName externalCamera, CameraConfigurationFunction configure, LinearOpMode mainClass, AprilTagProcessor apriltagProcessor) {
+        this(configure.apply(new VisionPortal.Builder().setCamera(externalCamera)), mainClass, apriltagProcessor);
     }
-    public AprilTagController(BuiltinCameraDirection phoneCamera, LinearOpMode mainClass) {
-        this(new VisionPortal.Builder().setCamera(phoneCamera), mainClass);
+
+    public AprilTagController(BuiltinCameraDirection phoneCamera, CameraConfigurationFunction configure, LinearOpMode mainClass, AprilTagProcessor apriltagProcessor) {
+        this(configure.apply(new VisionPortal.Builder().setCamera(phoneCamera)), mainClass, apriltagProcessor);
     }
 
     // RobotAutoDriveToAprilTagOmni.java
