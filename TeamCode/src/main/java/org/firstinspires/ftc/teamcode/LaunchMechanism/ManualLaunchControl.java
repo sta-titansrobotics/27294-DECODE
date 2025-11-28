@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.LaunchMechanism;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 
-public class ManualLaunchControl {
-    public final DcMotorSimple feeder;
-    public final DcMotorSimple launcher;
+public class ManualLaunchControl<T extends DcMotorSimple> {
+    public final T feeder;
+    public final T launcher;
 
-    public ManualLaunchControl(DcMotorSimple feeder, DcMotorSimple launcher) {
+    public ManualLaunchControl(T feeder, T launcher) {
         this.feeder = feeder;
         this.launcher = launcher;
 

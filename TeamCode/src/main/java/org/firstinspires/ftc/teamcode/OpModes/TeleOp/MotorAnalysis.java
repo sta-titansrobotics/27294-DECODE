@@ -63,8 +63,11 @@ public class MotorAnalysis extends LinearOpMode {
     
                     motor.setPower(motorPower);
 
-                    double timeSinceLast = getRuntime() - lastTime;
-                    double ticksPerMinute = ((double)(motor.getCurrentPosition() - lastPos)) * (60 / timeSinceLast);
+                    // rpm calculations
+                    double cTime = getRuntime();
+                    int cPos = motor.getCurrentPosition();
+                    double timeSinceLast = cTime - lastTime;
+                    double ticksPerMinute = ((double)(cPos - lastPos)) * (60 / timeSinceLast);
 
                     telemetry.addData("Currently Inspecting", motor.getMotorType().getName());
                     telemetry.addData("Name", motors.get(motor));
@@ -74,14 +77,16 @@ public class MotorAnalysis extends LinearOpMode {
                     telemetry.addData("RPM Calculations", (
                         ticksPerMinute / ticksPerRev
                     ));
+                    telemetry.addData("Current Position", motor.getCurrentPosition());
                     telemetry.addData("Detectable Motors", motors.size());
                     telemetry.addData("---", "---");
                     telemetry.addData("Right Bumper", "Next Motor");
                     telemetry.addData("DPad Left and Right", "decrease/increase power respectivly by 0.1");
                     telemetry.update();
 
-                    lastTime = getRuntime();
-                    lastPos = motor.getCurrentPosition();
+                    lastTime = cTime;
+                    lastPos = cPos;
+                    sleep(100);
                 }
 
                 motor.setPower(0);
