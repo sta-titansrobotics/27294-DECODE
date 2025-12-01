@@ -59,4 +59,16 @@ public class Drivechain4WD<T extends DcMotorSimple> {
         this.backLeft.setPower(-power);     // needs to move back to go right
         this.backRight.setPower(power);     // needs to move forward to go right
     }
+
+    /**
+     * rotates the bot on the spot, -1 is to the left and 1 is to the right
+     * @param pow
+     */
+    public void setRotatePower(float pow) {
+        this.frontLeft.setPower(pow);
+        this.backLeft.setPower(pow);
+
+        this.frontRight.setPower(-pow);
+        this.backRight.setPower(-pow);
+    }
 }

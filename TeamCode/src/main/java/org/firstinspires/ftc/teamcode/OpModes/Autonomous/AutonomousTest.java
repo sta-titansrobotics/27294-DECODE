@@ -4,6 +4,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.AprilTag.AprilTagController;
 import org.firstinspires.ftc.teamcode.DrivechainMovement.Drivechain4WD;
 import org.firstinspires.ftc.teamcode.LaunchMechanism.ManualLaunchControl;
+import org.firstinspires.ftc.teamcode.Utilities.RPMTracker;
 import org.firstinspires.ftc.vision.VisionPortal.StreamFormat;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
@@ -20,11 +21,11 @@ import android.util.Size;
 public class AutonomousTest extends LinearOpMode {
     public AprilTagController aprilTagProcess;
     public Drivechain4WD<DcMotor> drivechain;
-    public ManualLaunchControl launchControl;
+    public ManualLaunchControl<DcMotor> launchControl;
+    public RPMTracker<DcMotor> launchMotorRPM;
     public ColorSensor color;
 
     public Procedures currentProcedure = Procedures.NAVIGATE_TO_LAUNCHZONE; // assuming that at the start of auto we already have artefacts loaded, so we can navigate to a launchzone
-    public double timeoutUntil = 0;
 
     public int targetTagID_Team = TagID.BLUE_GOAL;
     public int targetTagID_Motif = TagID.GPP_OBLISK;
@@ -51,10 +52,12 @@ public class AutonomousTest extends LinearOpMode {
             hardwareMap.get(DcMotor.class, "backRight")
         );
 
-        // this.launchControl = new ManualLaunchControl(
-        //     hardwareMap.get(DcMotor.class, "feederMotor"),
-        //     hardwareMap.get(DcMotor.class, "launchMotor")
-        // );
+        this.launchControl = new ManualLaunchControl<>(
+            hardwareMap.get(DcMotor.class, "feederMotor"),
+            hardwareMap.get(DcMotor.class, "launchMotor")
+        );
+
+        this.launchMotorRPM = new RPMTracker<>(this.launchControl.launcher, getRuntime());
 
         while (opModeInInit()) {
             telemetry.addData("Configure Team Side", "X for Blue, B for Red");
@@ -91,67 +94,94 @@ public class AutonomousTest extends LinearOpMode {
             }
         }
         
+        boolean hasEnabledFeeder = false;
+        double timeWhenFeederEnabled = 0;
 
         // by default when the driver has not properly setup the configuration, the program will automatically assume blue team and GPP motif
         while (opModeIsActive()) {
-            // TODO check if in launchzone using color sensors
-
+            telemetry.addData("Current Procedure", this.currentProcedure);
             this.currentProcedure = Procedures.NAVIGATE_TO_LAUNCHZONE; // TODO: remove this line after testing
 
+            final AprilTagDetection detection;
+            final AprilTagPoseFtc pose;
             switch (this.currentProcedure) {
-                case WAIT: // always goes to NAVIGATE_TO_LAUNCHZONE as this is a grace period for team to load artefacts TODO
-                    if (getRuntime() <= this.timeoutUntil) continue;
-
-                    this.currentProcedure = Procedures.NAVIGATE_TO_LAUNCHZONE;
-                    break;
                 case NAVIGATE_TO_LAUNCHZONE: // TODO
-                    // if (this.inLaunchZone) {
-                    //     this.currentProcedure = Procedures.LAUNCH_ARTEFACTS;
-                    //     break;
-                    // }
+                    if (color.red() > 200 && color.green() > 200 && color.blue() > 200) {
+                        this.currentProcedure = Procedures.PREPARE_LAUNCH_ALIGNMENT;
+                        break;
+                    }
 
-                    // TODO: navigation to launchzone implementation
+                    detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
+                    if (detection == null) break; // TODO: rotate bot to find tag
+                    // TODO: rotate on the move to align tag instead of doing individual moves
 
-                    AprilTagDetection detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
-                    if (detection != null) {
-                        AprilTagPoseFtc pose = detection.ftcPose;
+                    pose = detection.ftcPose;
 
-                        if (Math.abs(pose.bearing) > 2) {
-                            drivechain.setSideManouverPower(pose.bearing > 0 ? -0.4f : 0.4f);
-                        } else drivechain.setPower(0);
-
-                        telemetry.addData("bearing", detection.ftcPose.bearing);
-                        telemetry.addData("distance", detection.ftcPose.range);
-                        telemetry.update();
-                    } else { // TODO: ask the builders if we can make the camera rotate lol
-                        
+                    if (Math.abs(pose.bearing) > 2) {
+                        drivechain.setSideManouverPower(pose.bearing > 0 ? -0.4f : 0.4f);
+                    } else {
+                        drivechain.setPower(0.5); // move forward as it may have not entered the launch zone
                     }
 
                     break;
-                case REV_LAUNCH_MOTOR: // TODO: TBD because we dont have a launch system yet
+                case PREPARE_LAUNCH_ALIGNMENT:
+                    // align with apriltag incase
+                    detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
+                    if (detection != null) {
+                        pose = detection.ftcPose;
+
+                        if (Math.abs(pose.bearing) > 2) {
+                            drivechain.setRotatePower(pose.bearing > 0 ? -0.4f : 0.4f);
+                        } else {
+                            drivechain.setPower(0);
+                            this.currentProcedure = Procedures.COMMIT_LAUNCH;
+                            this.launchMotorRPM.getRPM(getRuntime()); // reset
+
+                            break;
+                        }
+                    } else { // TODO: cant find april tag, keep rotating to find it
+                        
+                    }
                     break;
-                case LAUNCH_ARTEFACTS: // TODO: TBD because we dont have a launch system yet
+                case COMMIT_LAUNCH:
+                    this.launchControl.setEnableLauncher(true); // TODO: maybe change this to set power as enabling feeder motor may not be acurate as rpm can go down
+
+                    if (launchMotorRPM.getRPM(getRuntime()) >= 200) { // TODO: targetRPM Calculations (determine this on demand) (matybe substituite later for powerCalculations instead)
+                        this.launchControl.setFeederPower(1);
+                        timeWhenFeederEnabled = getRuntime();
+                        hasEnabledFeeder = true;
+                    }
+                    
+                    if (hasEnabledFeeder && getRuntime() >= timeWhenFeederEnabled + 10) {
+                        // TODO: after 10s go collect more artefacts (feature to detect when nor more artefacts are present) (for now suspend robot functions)
+                        this.launchControl.setFeederPower(0);
+                        this.launchControl.setEnableLauncher(false);
+                        hasEnabledFeeder = false;
+
+                        this.currentProcedure = Procedures.SUSPEND;
+                    }
+
                     break;
                 case FIND_ARTEFACTS_TO_INTAKE: // TODO: shall we do a bit of machine learning to do some object detection :D
                     break;
+                case SUSPEND:
+                    break;
             }
+
+            telemetry.update();
+            sleep(50); // prevents rpm tracker from fluctuating
         }
     }
-
-    public void setWaitTimeout(double ms) {
-        this.timeoutUntil = getRuntime() + ms;
-        this.currentProcedure = Procedures.WAIT;
-    }
-
 }
 
 enum Procedures {
     // NAVIGATE_TO_PIT, // NAVIGATE_TO_PIT is deprecated (we dont do that anymore since we gonna have intake system)
-    WAIT,
     NAVIGATE_TO_LAUNCHZONE,
-    REV_LAUNCH_MOTOR,
-    LAUNCH_ARTEFACTS,
-    FIND_ARTEFACTS_TO_INTAKE
+    PREPARE_LAUNCH_ALIGNMENT,
+    COMMIT_LAUNCH,
+    FIND_ARTEFACTS_TO_INTAKE,
+
+    SUSPEND
 }
 
 class TagID {
@@ -164,4 +194,5 @@ class TagID {
 }
 
 class Configuration {
+
 }

@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp
 public class TeleopMain extends LinearOpMode {
     public Drivechain4WD<DcMotor> drivechain;
-    public ManualLaunchControl launchControls;
+    public ManualLaunchControl<DcMotor> launchControls;
     public CRServo agitator;
 
     @Override
@@ -24,7 +24,7 @@ public class TeleopMain extends LinearOpMode {
             hardwareMap.get(DcMotor.class, "backRight")
         );
 
-        this.launchControls = new ManualLaunchControl(
+        this.launchControls = new ManualLaunchControl<>(
             hardwareMap.get(DcMotor.class, "feederMotor"),
             hardwareMap.get(DcMotor.class, "launchMotor")
         );
