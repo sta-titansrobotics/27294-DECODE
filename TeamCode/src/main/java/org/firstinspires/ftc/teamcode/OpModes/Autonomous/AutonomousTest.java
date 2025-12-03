@@ -80,8 +80,6 @@ public class AutonomousTest extends LinearOpMode {
             }
         }
 
-        // TODO: configure camera angle for motif detection (init stage)
-
         while (opModeInInit()) { // we gonna camp the motif banner to see what it is since they randomize it before starting auto
             telemetry.addData("Selected Team", targetTagID_Team);
             telemetry.addData("Detected Motif (GPP = 21, PGP = 22, PPG = 23)", targetTagID_Motif);
@@ -104,22 +102,26 @@ public class AutonomousTest extends LinearOpMode {
             final AprilTagDetection detection;
             final AprilTagPoseFtc pose;
             switch (this.currentProcedure) {
-                case NAVIGATE_TO_LAUNCHZONE: // TODO
-                    if (color.red() > 200 && color.green() > 200 && color.blue() > 200) {
-                        this.currentProcedure = Procedures.PREPARE_LAUNCH_ALIGNMENT;
-                        break;
-                    }
-
+                case NAVIGATE_TO_LAUNCHZONE:
                     detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
-                    if (detection == null) drivechain.setRotatePower(0.5d); // TODO: rotate bot to find tag
+                    if (detection == null) {
+                        drivechain.setRotatePower(0.3d); // TODO: rotate bot to find tag
+                        continue;
+                    }
                     // TODO: rotate on the move to align tag instead of doing individual moves
 
                     pose = detection.ftcPose;
 
-                    if (Math.abs(pose.bearing) > 2) {
-                        drivechain.setSideManouverPower(pose.bearing > 0 ? -0.4f : 0.4f);
+                    if (Math.abs(pose.x) > 10) {
+                        drivechain.setSideManouverPower(pose.x > 0 ? 0.4f : -0.4f);
                     } else {
                         drivechain.setPower(0.5); // move forward as it may have not entered the launch zone
+                    }
+
+                    if (color.red() > 250 && color.green() > 250 && color.blue() > 250) {
+                        this.currentProcedure = Procedures.PREPARE_LAUNCH_ALIGNMENT;
+                        this.drivechain.setPower(0);
+                        break;
                     }
 
                     break;
@@ -129,8 +131,8 @@ public class AutonomousTest extends LinearOpMode {
                     if (detection != null) {
                         pose = detection.ftcPose;
 
-                        if (Math.abs(pose.bearing) > 2) {
-                            drivechain.setRotatePower(pose.bearing > 0 ? -0.4f : 0.4f);
+                        if (Math.abs(pose.yaw) > 10) {
+                            drivechain.setRotatePower(pose.yaw > 0 ? 0.4f : -0.4f);
                         } else {
                             drivechain.setPower(0);
                             this.currentProcedure = Procedures.COMMIT_LAUNCH;
@@ -138,8 +140,8 @@ public class AutonomousTest extends LinearOpMode {
 
                             break;
                         }
-                    } else { // TODO: cant find april tag, keep rotating to find it
-                        
+                    } else {
+                        drivechain.setRotatePower(0.3d); // TODO: mayb change rotation power
                     }
                     break;
                 case COMMIT_LAUNCH:
@@ -171,6 +173,7 @@ public class AutonomousTest extends LinearOpMode {
             sleep(50); // prevents rpm tracker from fluctuating
         }
     }
+
 }
 
 enum Procedures {
