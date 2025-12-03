@@ -15,8 +15,8 @@ public class ManualLaunchControl<T extends DcMotorSimple> {
         launcher.setDirection(Direction.REVERSE);
     }
 
-    public void setEnableLauncher(boolean should) {
-        this.launcher.setPower(should ? 1 : 0);
+    public void setEnableLauncher(boolean enable) {
+        this.launcher.setPower(enable ? 1 : 0);
     }
 
     public void setFeederPower(double pow) {

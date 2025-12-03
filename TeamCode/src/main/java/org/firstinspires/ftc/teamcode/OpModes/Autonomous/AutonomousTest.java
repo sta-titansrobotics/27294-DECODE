@@ -100,7 +100,6 @@ public class AutonomousTest extends LinearOpMode {
         // by default when the driver has not properly setup the configuration, the program will automatically assume blue team and GPP motif
         while (opModeIsActive()) {
             telemetry.addData("Current Procedure", this.currentProcedure);
-            this.currentProcedure = Procedures.NAVIGATE_TO_LAUNCHZONE; // TODO: remove this line after testing
 
             final AprilTagDetection detection;
             final AprilTagPoseFtc pose;
@@ -112,7 +111,7 @@ public class AutonomousTest extends LinearOpMode {
                     }
 
                     detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
-                    if (detection == null) break; // TODO: rotate bot to find tag
+                    if (detection == null) drivechain.setRotatePower(0.5d); // TODO: rotate bot to find tag
                     // TODO: rotate on the move to align tag instead of doing individual moves
 
                     pose = detection.ftcPose;

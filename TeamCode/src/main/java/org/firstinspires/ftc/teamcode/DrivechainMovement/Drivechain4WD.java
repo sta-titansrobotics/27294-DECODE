@@ -64,7 +64,7 @@ public class Drivechain4WD<T extends DcMotorSimple> {
      * rotates the bot on the spot, -1 is to the left and 1 is to the right
      * @param pow
      */
-    public void setRotatePower(float pow) {
+    public void setRotatePower(double pow) {
         this.frontLeft.setPower(pow);
         this.backLeft.setPower(pow);
 
