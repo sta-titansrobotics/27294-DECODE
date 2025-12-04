@@ -1,0 +1,4 @@
+gamepad:
+
+x: move agitator (fwd/back) (full power)
+y: move agitator (fwd/back) (full power)

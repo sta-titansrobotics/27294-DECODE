@@ -75,4 +75,14 @@ public class AprilTagController {
 
         return null;
     }
+
+    public @Nullable AprilTagDetection getDetectionByID(int... targetIDs) {
+        for (AprilTagDetection detection : this.tagProcessor.getDetections()) {
+            for (int targetID : targetIDs) {
+                if (detection.id == targetID) return detection;
+            }
+        }
+
+        return null;
+    }
 }

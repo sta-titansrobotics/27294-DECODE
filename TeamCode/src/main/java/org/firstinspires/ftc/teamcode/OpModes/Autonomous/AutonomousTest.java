@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.IMU;
 
 import android.util.Size;
 
@@ -103,7 +104,7 @@ public class AutonomousTest extends LinearOpMode {
             final AprilTagPoseFtc pose;
             switch (this.currentProcedure) {
                 case NAVIGATE_TO_LAUNCHZONE:
-                    detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
+                    detection = this.aprilTagProcess.getDetectionByID(TagID.BLUE_GOAL, TagID.RED_GOAL);
                     if (detection == null) {
                         drivechain.setRotatePower(0.3d); // TODO: rotate bot to find tag
                         continue;
@@ -118,9 +119,14 @@ public class AutonomousTest extends LinearOpMode {
                         drivechain.setPower(0.5); // move forward as it may have not entered the launch zone
                     }
 
+                    // launchzone entry detection
                     if (color.red() > 250 && color.green() > 250 && color.blue() > 250) {
                         this.currentProcedure = Procedures.PREPARE_LAUNCH_ALIGNMENT;
-                        this.drivechain.setPower(0);
+                        if (detection.id == targetTagID_Team) {
+                            this.drivechain.setPower(0);
+                        } else {
+                            this.drivechain.setRotatePower(detection.id == TagID.BLUE_GOAL ? 0.5f : -0.5f);
+                        }
                         break;
                     }
 
@@ -140,8 +146,6 @@ public class AutonomousTest extends LinearOpMode {
 
                             break;
                         }
-                    } else {
-                        drivechain.setRotatePower(0.3d); // TODO: mayb change rotation power
                     }
                     break;
                 case COMMIT_LAUNCH:
@@ -149,8 +153,10 @@ public class AutonomousTest extends LinearOpMode {
 
                     if (launchMotorRPM.getRPM(getRuntime()) >= 200) { // TODO: targetRPM Calculations (determine this on demand) (matybe substituite later for powerCalculations instead)
                         this.launchControl.setFeederPower(1);
-                        timeWhenFeederEnabled = getRuntime();
-                        hasEnabledFeeder = true;
+                        if (!hasEnabledFeeder) {
+                            timeWhenFeederEnabled = getRuntime();
+                            hasEnabledFeeder = true;
+                        }
                     }
                     
                     if (hasEnabledFeeder && getRuntime() >= timeWhenFeederEnabled + 10) {
