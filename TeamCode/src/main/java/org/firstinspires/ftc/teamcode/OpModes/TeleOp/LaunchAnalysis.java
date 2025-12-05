@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
-import org.firstinspires.ftc.teamcode.LaunchMechanism.ManualLaunchControl;
+import org.firstinspires.ftc.teamcode.Mechanisms.ManualLaunchControl;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;

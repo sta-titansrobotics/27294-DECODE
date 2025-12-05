@@ -1,15 +1,15 @@
-package org.firstinspires.ftc.teamcode.DrivechainMovement;
+package org.firstinspires.ftc.teamcode.Mechanisms;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
 
-public class Drivechain4WD<T extends DcMotorSimple> {
+public class Drivechain4Motors<T extends DcMotorSimple> {
     public final T frontLeft;
     public final T frontRight;
     public final T backLeft;
     public final T backRight;
 
-    public Drivechain4WD(T fl, T fr, T bl, T br) {
+    public Drivechain4Motors(T fl, T fr, T bl, T br) {
         this.frontLeft = fl;
         this.frontRight = fr;
         this.backLeft = bl;

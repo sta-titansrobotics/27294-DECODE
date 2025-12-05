@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
-import org.firstinspires.ftc.teamcode.DrivechainMovement.Drivechain4WD;
-import org.firstinspires.ftc.teamcode.LaunchMechanism.ManualLaunchControl;
+import org.firstinspires.ftc.teamcode.Mechanisms.Drivechain4Motors;
+import org.firstinspires.ftc.teamcode.Mechanisms.ManualLaunchControl;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -11,13 +11,13 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp
 public class TeleopMain extends LinearOpMode {
-    public Drivechain4WD<DcMotor> drivechain;
+    public Drivechain4Motors<DcMotor> drivechain;
     public ManualLaunchControl<DcMotor> launchControls;
     public CRServo agitator;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        this.drivechain = new Drivechain4WD<>(
+        this.drivechain = new Drivechain4Motors<>(
             hardwareMap.get(DcMotor.class, "frontLeft"),
             hardwareMap.get(DcMotor.class, "frontRight"),
             hardwareMap.get(DcMotor.class, "backLeft"),

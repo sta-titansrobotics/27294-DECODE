@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.AprilTag.AprilTagController;
-import org.firstinspires.ftc.teamcode.DrivechainMovement.Drivechain4WD;
-import org.firstinspires.ftc.teamcode.LaunchMechanism.ManualLaunchControl;
+import org.firstinspires.ftc.teamcode.Mechanisms.Drivechain4Motors;
+import org.firstinspires.ftc.teamcode.Mechanisms.ManualLaunchControl;
 import org.firstinspires.ftc.teamcode.Utilities.RPMTracker;
 import org.firstinspires.ftc.vision.VisionPortal.StreamFormat;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -14,14 +14,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.IMU;
 
 import android.util.Size;
 
 @Autonomous
 public class AutonomousTest extends LinearOpMode {
     public AprilTagController aprilTagProcess;
-    public Drivechain4WD<DcMotor> drivechain;
+    public Drivechain4Motors<DcMotor> drivechain;
     public ManualLaunchControl<DcMotor> launchControl;
     public RPMTracker<DcMotor> launchMotorRPM;
     public ColorSensor color;
@@ -46,7 +45,7 @@ public class AutonomousTest extends LinearOpMode {
 
         this.color = hardwareMap.get(ColorSensor.class, "color");
 
-        this.drivechain = new Drivechain4WD<>(
+        this.drivechain = new Drivechain4Motors<>(
             hardwareMap.get(DcMotor.class, "frontLeft"),
             hardwareMap.get(DcMotor.class, "frontRight"),
             hardwareMap.get(DcMotor.class, "backLeft"),
@@ -95,6 +94,7 @@ public class AutonomousTest extends LinearOpMode {
         
         boolean hasEnabledFeeder = false;
         double timeWhenFeederEnabled = 0;
+        int tagNotFoundCount = 0;
 
         // by default when the driver has not properly setup the configuration, the program will automatically assume blue team and GPP motif
         while (opModeIsActive()) {
@@ -109,7 +109,6 @@ public class AutonomousTest extends LinearOpMode {
                         drivechain.setRotatePower(0.3d); // TODO: rotate bot to find tag
                         continue;
                     }
-                    // TODO: rotate on the move to align tag instead of doing individual moves
 
                     pose = detection.ftcPose;
 
@@ -120,19 +119,24 @@ public class AutonomousTest extends LinearOpMode {
                     }
 
                     // launchzone entry detection
-                    if (color.red() > 250 && color.green() > 250 && color.blue() > 250) {
+                    if (
+                        color.red() > Configuration.LaunchLine_Trigger_Threshold &&
+                        color.green() > Configuration.LaunchLine_Trigger_Threshold &&
+                        color.blue() > Configuration.LaunchLine_Trigger_Threshold
+                    ) {
                         this.currentProcedure = Procedures.PREPARE_LAUNCH_ALIGNMENT;
+                        tagNotFoundCount = 0;
                         if (detection.id == targetTagID_Team) {
-                            this.drivechain.setPower(0);
+                            this.drivechain.setPower(0); // stop if we are facing the correct tag
                         } else {
-                            this.drivechain.setRotatePower(detection.id == TagID.BLUE_GOAL ? 0.5f : -0.5f);
+                            this.drivechain.setRotatePower(detection.id == TagID.BLUE_GOAL ? 0.5f : -0.5f); // rotate if facing different tag
                         }
                         break;
                     }
 
                     break;
                 case PREPARE_LAUNCH_ALIGNMENT:
-                    // align with apriltag incase
+                    // check again if we are in alienment with apriltag
                     detection = this.aprilTagProcess.getDetectionByID(targetTagID_Team);
                     if (detection != null) {
                         pose = detection.ftcPose;
@@ -143,9 +147,10 @@ public class AutonomousTest extends LinearOpMode {
                             drivechain.setPower(0);
                             this.currentProcedure = Procedures.COMMIT_LAUNCH;
                             this.launchMotorRPM.getRPM(getRuntime()); // reset
-
-                            break;
                         }
+                    } else {
+                        if (tagNotFoundCount++ > Configuration.Preperation_Count_Timeout) this.currentProcedure = Procedures.HALT; // proceed to launch anyway
+                        sleep(1000);
                     }
                     break;
                 case COMMIT_LAUNCH:
@@ -165,13 +170,13 @@ public class AutonomousTest extends LinearOpMode {
                         this.launchControl.setEnableLauncher(false);
                         hasEnabledFeeder = false;
 
-                        this.currentProcedure = Procedures.SUSPEND;
+                        this.currentProcedure = Procedures.HALT;
                     }
 
                     break;
                 case FIND_ARTEFACTS_TO_INTAKE: // TODO: shall we do a bit of machine learning to do some object detection :D
                     break;
-                case SUSPEND:
+                case HALT:
                     break;
             }
 
@@ -189,7 +194,7 @@ enum Procedures {
     COMMIT_LAUNCH,
     FIND_ARTEFACTS_TO_INTAKE,
 
-    SUSPEND
+    HALT
 }
 
 class TagID {
@@ -202,5 +207,6 @@ class TagID {
 }
 
 class Configuration {
-
+    public static final int LaunchLine_Trigger_Threshold = 200;
+    public static final int Preperation_Count_Timeout = 1;
 }
