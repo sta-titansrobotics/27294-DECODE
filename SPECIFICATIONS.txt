@@ -2,3 +2,8 @@ gamepad:
 
 x: move agitator (fwd/back) (full power)
 y: move agitator (fwd/back) (full power)
+
+lift inside is manulally operated with servo (use touch sensor to detect when it has reached the top)
+
+internal mechanisms are handled by second gamepad
+drivechain is handled my first gamepad
