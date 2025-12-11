@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
+package org.firstinspires.ftc.teamcode.OpModes.Analysis;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.ManualLaunchControl;
 
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp
+@TeleOp(group = "Analysis")
 public class LaunchAnalysis extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

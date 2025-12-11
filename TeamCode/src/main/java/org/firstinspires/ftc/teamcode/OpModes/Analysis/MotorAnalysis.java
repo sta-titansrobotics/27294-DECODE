@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
+package org.firstinspires.ftc.teamcode.OpModes.Analysis;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-@TeleOp
+@TeleOp(group = "Analysis")
 public class MotorAnalysis extends LinearOpMode {
     @SuppressWarnings("unchecked") // in try/catch; unless they changed the code this is *probably* not an issue
     @Override
@@ -49,7 +49,7 @@ public class MotorAnalysis extends LinearOpMode {
 
             for (DcMotor motor : motors.keySet()) {
                 int lastPos = 0;
-                double lastTime = getRuntime();
+                double lastTime = getRuntime(); 
                 double ticksPerRev = motor.getMotorType().getTicksPerRev();
 
                 while (opModeIsActive()) {
