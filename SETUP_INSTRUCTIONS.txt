@@ -8,22 +8,28 @@ Before you open vscode, ensure that the environmental variables ANDROID_HOME and
     On MacOS:
         1. Open your terminal
         2. Run the following commands, subsituting as nessesary
-            launchctl setenv ANDROID_HOME path_to_installation (https://developer.android.com/tools/sdkmanager)
-            launchctl setenv JAVA_HOME path_to_installation(should end with `Home/` if you extaracted the jdk)
+            launchctl setenv ANDROID_HOME path_to_installation
+                [?] https://developer.android.com/tools/sdkmanager
+            launchctl setenv JAVA_HOME path_to_installation
+                [?] (path_to_installation should end with `Home/` if you extaracted the jdk)
+                [?] the folder that this points to usually has to contain a `bin` folder
 
             PLEASE USE ABSOLUTE PATH (dont use ~/ or ./)
             [?] If you are already in the folder with the installation, you may substitute path_to_installation with "`PWD`"
+
+            [?] If you do not want to run this everytime then copy macos-init.sh in the root project folder and copy it somewhere you will remember and substitute the values as specified above
+                [!] if you do not have permission to run it then open up the terminla and navigate to the folder with the file you copied using `cd` and run `chmod +x macos-init.sh`
         3. Ensure that you completely close vscode (should not be available in your dock (taskbar of windows))
         4. Reopen vscode and clean the workspace (Command Palette > Java: Clean Java Language Server Workspace)
             If the libraries are still not being referenced by vscode open up the integrated terminal (default Meta+`)
             Then run ./gradlew clean build (assuming the terminal puts you into the project root directory)
             After the command "BUILD SUCCESSFUL", clean the workspace again and it should work (hopefully)
 
-        [!] If MacOS gives you a stpid message that java "may" contain a virus. you can bypass it using the following:
+        [!] If MacOS gives you a stupid message that java "may" contain a virus. you can bypass it by doing the following:
             1. Go to where your jdk is (it is where you set your JAVA_HOME variable)
             2. Copy the macos-jdk-perm-fix.sh file from this project into that folder
             3. In your terminal run the file
-                [?] If you do not have permission use chmod +x macos-jdk-perm-fix.sh
+                [?] If you do not have permission use `chmod +x macos-jdk-perm-fix.sh`
                 [?] then run the command again
 
 If there is an error saying that it cannot find StringConcatFactory

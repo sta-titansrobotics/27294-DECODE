@@ -1,0 +1,2 @@
+launchctl setenv ANDROID_HOME path_to_installation
+launchctl setenv JAVA_HOME path_to_installation
