@@ -13,13 +13,13 @@ body:
       description: Ensure you have done these steps before finalizing the issue
       options:
         - label: I have ensured that I am using the DriveTest Configuration on the robot (unless otherwise specified by the robot during its pre-init stage, which is right before you press the play button)
-          required: true
+          required: false
         - label: I have ensured that I have wired all the components in correctly and that I have them named properly in the configuration (if the error `Unable to find a hardware device with name ___ and type ___` occurs, then recheck the configuration and ensure that the specific device is configured correctly with said name and set to the appropriate device type) (remeber that google and your teacher is always the greatest resource when helping here)
-          required: true
+          required: false
         - label: I have ensured that I am running the bot on the most up to date code (if you are unsure about this then pull the latest code from the repository and compile & upload to the bot and try again before finalizing the issue)
-          required: true
+          required: false
         - label: I have ensured that I have at least tried to understand the error code reported by the robot to some extent (eg. if you see an error with nullpointerexception then i dont expect you to understand and thefore you may check this box if you have encountered this in the first place)
-          required: true
+          required: false
     validations:
       required: false
 
