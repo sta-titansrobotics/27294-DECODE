@@ -71,7 +71,7 @@ public class MotorAnalysis extends LinearOpMode {
 
                     telemetry.addData("Currently Inspecting", motor.getMotorType().getName());
                     telemetry.addData("Name", motors.get(motor));
-                    telemetry.addData("Tracked Power", motorPower);
+                    telemetry.addData("Code Set Power", motorPower);
                     telemetry.addData("Reported Power", motor.getPower());
                     telemetry.addData("Max RPM", motor.getMotorType().getMaxRPM());
                     telemetry.addData("RPM Calculations", (

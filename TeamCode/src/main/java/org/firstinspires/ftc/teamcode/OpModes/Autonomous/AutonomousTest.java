@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.OpModes.Autonomous;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.AprilTag.AprilTagController;
 import org.firstinspires.ftc.teamcode.Mechanisms.Drivechain4Motors;
-import org.firstinspires.ftc.teamcode.Mechanisms.ManualLaunchControl;
 import org.firstinspires.ftc.teamcode.Utilities.RPMTracker;
+import org.firstinspires.ftc.teamcode.Utilities.Setup;
 import org.firstinspires.ftc.vision.VisionPortal.StreamFormat;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
@@ -21,7 +21,8 @@ import android.util.Size;
 public class AutonomousTest extends LinearOpMode {
     public AprilTagController aprilTagProcess;
     public Drivechain4Motors<DcMotor> drivechain;
-    public ManualLaunchControl<DcMotor> launchControl;
+    public DcMotor launchMotor;
+    public DcMotor feederMotor;
     public RPMTracker<DcMotor> launchMotorRPM;
     public ColorSensor color;
 
@@ -52,12 +53,11 @@ public class AutonomousTest extends LinearOpMode {
             hardwareMap.get(DcMotor.class, "backRight")
         );
 
-        this.launchControl = new ManualLaunchControl<>(
-            hardwareMap.get(DcMotor.class, "feederMotor"),
-            hardwareMap.get(DcMotor.class, "launchMotor")
-        );
+        this.feederMotor = hardwareMap.get(DcMotor.class, "feederMotor");
+        this.launchMotor = hardwareMap.get(DcMotor.class, "launchMotor");
+        Setup.launchMotors(this.launchMotor, this.feederMotor);
 
-        this.launchMotorRPM = new RPMTracker<>(this.launchControl.launcher, getRuntime());
+        this.launchMotorRPM = new RPMTracker<>(this.launchMotor, getRuntime());
 
         while (opModeInInit()) {
             telemetry.addData("Configure Team Side", "X for Blue, B for Red");
@@ -154,10 +154,10 @@ public class AutonomousTest extends LinearOpMode {
                     }
                     break;
                 case COMMIT_LAUNCH:
-                    this.launchControl.setEnableLauncher(true); // TODO: maybe change this to set power as enabling feeder motor may not be acurate as rpm can go down
+                    this.launchMotor.setPower(1); // TODO: maybe change this to set power as enabling feeder motor may not be acurate as rpm can go down
 
                     if (launchMotorRPM.getRPM(getRuntime()) >= 200) { // TODO: targetRPM Calculations (determine this on demand) (matybe substituite later for powerCalculations instead)
-                        this.launchControl.setFeederPower(1);
+                        this.feederMotor.setPower(1);
                         if (!hasEnabledFeeder) {
                             timeWhenFeederEnabled = getRuntime();
                             hasEnabledFeeder = true;
@@ -166,8 +166,8 @@ public class AutonomousTest extends LinearOpMode {
                     
                     if (hasEnabledFeeder && getRuntime() >= timeWhenFeederEnabled + 10) {
                         // TODO: after 10s go collect more artefacts (feature to detect when nor more artefacts are present) (for now suspend robot functions)
-                        this.launchControl.setFeederPower(0);
-                        this.launchControl.setEnableLauncher(false);
+                        this.feederMotor.setPower(0);
+                        this.launchMotor.setPower(0);
                         hasEnabledFeeder = false;
 
                         this.currentProcedure = Procedures.HALT;

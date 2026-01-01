@@ -21,13 +21,13 @@ public class RPMTracker<T extends DcMotor> {
     /**
      * Calculates the RPM of the motor since the last time this method was called
      * 
-     * @param cTime - call getRuntime() and pass it into this method
+     * @param currentTime - call getRuntime() and pass it into this method
      * @return
      */
-    public double getRPM(double cTime) {
+    public double getRPM(double currentTime) {
         int cPos = this.motor.getCurrentPosition();
 
-        double timeSinceLast = cTime - this.lastTime;
+        double timeSinceLast = currentTime - this.lastTime;
         double ticksPerMinute = ((double)(cPos - this.lastPosition)) * (60d / timeSinceLast);
 
         return ticksPerMinute / this.ticksPerRev;
