@@ -82,3 +82,6 @@ lint/tmp/
 
 # unless otherwise stated, there is no reason to sync these changes
 gradle.properties
+
+# setup directory for get.sh
+temp/

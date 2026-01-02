@@ -1,5 +1,15 @@
 Before you open vscode, ensure that the environmental variables ANDROID_HOME and JAVA_HOME are set
     On Windows:
+        [!!!] NEW SETUP YAY
+        [!!!] i has setup a script for people on windows to setup the workspace to some extent
+        [!!!]   run get.sh and wait until the script is complete
+        [!!!] then move all the files that were generated in temp/ in to another folder that you will remeber or you can just leave it there that is fine
+        [!!!] then run get_paths.sh and set ANDROID_HOME and JAVA_HOME to the values specified in the script you ran in your environmental variables (look up how to set them)
+        [!!!] then add the final value to path
+        [!!!] save changes and run final_setup.sh and accept the terms to the licences (this is required for the workspace to work)
+        [!!!] close vscode and reopen
+        [!!!] if it doesnt do the funny autocomplete with the android packages after it finished loading, run `./gradlew clean build` and refresh the workspace after the build is successful
+
         Set your environmental variables for your LOCAL ACCOUNT (going to the search bar and find the result `Edit environment variables for your account`)
         Close vscode, reopen then clean the workspace (Command Palette > Java: Clean Java Language Server Workspace)
             If the libraries are still not being referenced by vscode open up the integrated terminal (default Ctrl+`)
