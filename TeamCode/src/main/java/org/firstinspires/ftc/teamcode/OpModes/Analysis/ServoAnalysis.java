@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(group = "Analysis")
 public class ServoAnalysis extends LinearOpMode {
@@ -50,18 +51,20 @@ public class ServoAnalysis extends LinearOpMode {
             for (Servo servo : servos.keySet()) {
                 while (opModeIsActive()) {
                     if (this.gamepad1.dpadLeftWasPressed()) {
-                        setPos -= 1;
+                        setPos -= 0.001;
                     } else if (this.gamepad1.dpadRightWasPressed()) {
-                        setPos += 1;
+                        setPos += 0.001;
                     } else if (this.gamepad1.leftBumperWasPressed()) {
-                        setPos -= 10;
+                        setPos -= 0.01;
                     } else if (this.gamepad1.rightBumperWasPressed()) {
-                        setPos += 10;
+                        setPos += 0.01;
                     } else if (this.gamepad1.xWasPressed()) {
-                        setPos -= 100;
+                        setPos -= 0.1;
                     } else if (this.gamepad1.bWasPressed()) {
-                        setPos += 100;
+                        setPos += 0.1;
                     }
+
+                    setPos = Range.clip(setPos, 0, 1);
 
                     if (this.gamepad1.backWasPressed()) break;
                     servo.setPosition(setPos);
@@ -72,9 +75,9 @@ public class ServoAnalysis extends LinearOpMode {
                     telemetry.addData("Number of Detectable Servos", servos.size());
                     telemetry.addData("---", "---");
                     telemetry.addData("Back", "Next Servo");
-                    telemetry.addData("DPAD Left/Right", "-+ 1");
-                    telemetry.addData("Bumper Left/Right", "-+ 10");
-                    telemetry.addData("X/B", "-+ 100");
+                    telemetry.addData("DPAD Left/Right", "-+ 0.001");
+                    telemetry.addData("Bumper Left/Right", "-+ 0.01");
+                    telemetry.addData("X/B", "-+ 0.1");
                     telemetry.update();
                 }
 
