@@ -7,3 +7,17 @@ lift inside is manulally operated with servo (use touch sensor to detect when it
 
 internal mechanisms are handled by second gamepad
 drivechain is handled my first gamepad
+
+gamepad1: drivechain
+dpad: no rotation movement
+left joystick: forward and back
+right joystick: rotation
+    [!] prioritise joystick over dpad
+right trigger: flywheel
+left trigger: feeder
+left-right bumper: hood (0.05 increase every time per loop)
+
+gamepad2: misc.
+left trigger: servo gate (hold to power)
+right trigger: intake (hold to power)
+left-right dpad: scissor lift (0.1 increase every time per loop (10x per sec))

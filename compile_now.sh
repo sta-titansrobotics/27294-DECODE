@@ -1,4 +1,5 @@
-read -p "Please ensure that you do NOT have the driver station connected to your computer via tcp/ip or usb, the only external device that should be connected to your computer is the control hub (basically dont connect anything that is running android unless it is a control hub). Press enter to continue if you understand this"
+echo "Please ensure that you do NOT have the driver station connected to your computer via tcp/ip or usb, the only external device that should be connected to your computer is the control hub (basically dont connect anything that is running android unless it is a control hub)."
+read -p "Press enter to continue if you understand this"
 
 if [ ! -d "./temp" ]; then
     echo "setting up compile workspace pls wait..."
