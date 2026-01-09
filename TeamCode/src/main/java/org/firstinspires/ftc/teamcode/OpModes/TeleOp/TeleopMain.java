@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Mechanisms.Drivechain4Motors;
-import org.firstinspires.ftc.teamcode.Mechanisms.HoodControl;
 import org.firstinspires.ftc.teamcode.Utilities.Setup;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -14,12 +13,17 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp
 public class TeleopMain extends LinearOpMode {
     public Drivechain4Motors<DcMotor> drivechain;
-    public HoodControl hood;
     public DcMotor feederMotor;
     public DcMotor launchMotor;
     public DcMotor intakeMotor;
     public CRServo agitator;
+    public CRServo gateServo;
+    public Servo hoodServo;
+    public Servo liftServo;
     
+    // incase one cycle last less then 0.1 or more
+    public long timeToCatch = 1; // 1 = 100ms
+
     @Override
     public void runOpMode() throws InterruptedException {
         this.drivechain = new Drivechain4Motors<>(
@@ -29,20 +33,22 @@ public class TeleopMain extends LinearOpMode {
             hardwareMap.get(DcMotor.class, "backRight")
         );
 
-        this.hood = new HoodControl(
-            hardwareMap.get(Servo.class, "hoodServo"),
-            0 // TODO: get values stat.
-        );
+        this.hoodServo = hardwareMap.get(Servo.class, "hoodServo");
 
         this.feederMotor = hardwareMap.get(DcMotor.class, "feederMotor");
         this.launchMotor = hardwareMap.get(DcMotor.class, "launchMotor");
         Setup.launchMotors(this.launchMotor, this.feederMotor);
+        this.intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
         this.agitator = hardwareMap.get(CRServo.class, "agitator");
-        this.intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        this.gateServo = hardwareMap.get(CRServo.class, "gateServo");
+        this.liftServo = hardwareMap.get(Servo.class, "liftServo");
 
         telemetry.addData("status", "awaiting init");
         telemetry.update();
+
+        double hoodPos = 0;
+        double liftPos = 0;
 
         waitForStart();
 
@@ -73,16 +79,27 @@ public class TeleopMain extends LinearOpMode {
                 );
             }
 
-            // a / y: agitator control
-            if (this.gamepad2.x || this.gamepad2.y) {
-                this.agitator.setPower(this.gamepad2.x ? -1 : 1); // y will be forward
-            } else {
-                this.agitator.setPower(0);
+            this.feederMotor.setPower(this.gamepad1.left_trigger > 0.1f ? 1 : 0);
+            this.launchMotor.setPower(this.gamepad1.right_trigger > 0.1f ? 1 : 0);
+            if (this.gamepad1.left_bumper ^ this.gamepad1.right_bumper) {
+                hoodPos = Range.clip(
+                    hoodPos + (this.gamepad1.left_bumper ? -0.05 : 0.05),
+                    0, 1
+                );
             }
+            this.hoodServo.setPosition(hoodPos);
 
+
+            this.gateServo.setPower(this.gamepad2.left_trigger > 0.1f ? 1 : 0);
             this.intakeMotor.setPower(this.gamepad2.left_bumper ? 1 : 0);
-            this.feederMotor.setPower(this.gamepad2.right_trigger > 0.1f ? 1 : 0);
-            this.launchMotor.setPower(this.gamepad2.left_trigger > 0.1f ? 1 : 0);
+            if (this.gamepad2.dpad_up ^ this.gamepad2.dpad_down) {
+                liftPos = Range.clip(
+                    liftPos + (this.gamepad2.dpad_up ? 0.1 : -0.1),
+                    rotationalOffset, forwardPower
+                );
+            }
+            this.liftServo.setPosition(liftPos);
+
 
             telemetry.addData("status", "running");
             telemetry.addData("Left Trigger", "Launch Motor");
@@ -92,7 +109,12 @@ public class TeleopMain extends LinearOpMode {
             telemetry.addData("DPad", "stationary manouvers, joysticks will be disabled when using dpad actively");
             telemetry.update();
 
-            sleep(100);
+            long val = (long)getRuntime() * 10;
+            if (val < timeToCatch) {
+                sleep(val * 100);
+            }
+
+            timeToCatch += 1;
         }
 
         telemetry.addData("status", "stopped");
