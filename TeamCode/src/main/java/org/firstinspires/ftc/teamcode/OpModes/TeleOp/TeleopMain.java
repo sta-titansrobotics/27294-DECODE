@@ -16,7 +16,6 @@ public class TeleopMain extends LinearOpMode {
     public DcMotor feederMotor;
     public DcMotor launchMotor;
     public DcMotor intakeMotor;
-    public CRServo agitator;
     public CRServo gateServo;
     public Servo hoodServo;
     public Servo liftServo;
@@ -40,7 +39,6 @@ public class TeleopMain extends LinearOpMode {
         Setup.launchMotors(this.launchMotor, this.feederMotor);
         this.intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
-        this.agitator = hardwareMap.get(CRServo.class, "agitator");
         this.gateServo = hardwareMap.get(CRServo.class, "gateServo");
         this.liftServo = hardwareMap.get(Servo.class, "liftServo");
 
