@@ -17,6 +17,7 @@ public class TeleopMain extends LinearOpMode {
     public DcMotor launchMotor;
     public DcMotor intakeMotor;
     public CRServo gateServo;
+    public CRServo internalAgitator;
     public Servo hoodServo;
     public Servo liftServo;
     
@@ -40,6 +41,7 @@ public class TeleopMain extends LinearOpMode {
         this.intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
 
         this.gateServo = hardwareMap.get(CRServo.class, "gateServo");
+        this.gateServo.setDirection(CRServo.Direction.REVERSE);
         this.liftServo = hardwareMap.get(Servo.class, "liftServo");
 
         telemetry.addData("status", "awaiting init");
@@ -55,15 +57,16 @@ public class TeleopMain extends LinearOpMode {
             float rotationalOffset = this.gamepad1.right_stick_x; // left is -1 and right is 1
             float forwardPower = -this.gamepad1.left_stick_y;  // according to ftc docs, without negating the value; 1 is down -1 is up
 
-            if (this.gamepad1.dpad_up || this.gamepad1.dpad_down) { // dpad movement fwd and bk
-                boolean fwdSDir = this.gamepad1.dpad_up ? this.gamepad1.dpad_right : this.gamepad1.dpad_left;
-                boolean bwdSDir = this.gamepad1.dpad_up ? this.gamepad1.dpad_left : this.gamepad1.dpad_right;
-                int power = this.gamepad1.dpad_up ? 1 : -1;
-
-                this.drivechain.frontLeft.setPower(bwdSDir ? 0 : power);
-                this.drivechain.frontRight.setPower(fwdSDir ? 0 : power);
-                this.drivechain.backLeft.setPower(fwdSDir ? 0 : power);
-                this.drivechain.backRight.setPower(bwdSDir ? 0 : power);
+            if (this.gamepad1.dpad_up) { // dpad movement fwd and bk
+                this.drivechain.frontLeft.setPower(this.gamepad1.dpad_left ? 0 : 1);
+                this.drivechain.frontRight.setPower(this.gamepad1.dpad_right ? 0 : 1);
+                this.drivechain.backLeft.setPower(this.gamepad1.dpad_right ? 0 : 1);
+                this.drivechain.backRight.setPower(this.gamepad1.dpad_left ? 0 : 1);
+            } else if (this.gamepad1.dpad_down) {
+                this.drivechain.frontLeft.setPower(this.gamepad1.dpad_right ? 0 : -1);
+                this.drivechain.frontRight.setPower(this.gamepad1.dpad_left ? 0 : -1);
+                this.drivechain.backLeft.setPower(this.gamepad1.dpad_left ? 0 : -1);
+                this.drivechain.backRight.setPower(this.gamepad1.dpad_right ? 0 : -1);
             } else if (this.gamepad1.dpad_left || this.gamepad1.dpad_right) { // dpad movement side to side
                 this.drivechain.setSideManouverPower(this.gamepad1.dpad_right ? 1 : -1);
             } else if (forwardPower == 0) { // stationary rotation
@@ -93,7 +96,7 @@ public class TeleopMain extends LinearOpMode {
             if (this.gamepad2.dpad_up ^ this.gamepad2.dpad_down) {
                 liftPos = Range.clip(
                     liftPos + (this.gamepad2.dpad_up ? 0.1 : -0.1),
-                    rotationalOffset, forwardPower
+                    0, 1
                 );
             }
             this.liftServo.setPosition(liftPos);
@@ -109,7 +112,7 @@ public class TeleopMain extends LinearOpMode {
 
             long val = (long)getRuntime() * 10;
             if (val < timeToCatch) {
-                sleep(val * 100);
+                sleep((timeToCatch - val) * 100);
             }
 
             timeToCatch += 1;

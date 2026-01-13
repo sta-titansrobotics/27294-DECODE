@@ -21,3 +21,9 @@ gamepad2: misc.
 left trigger: servo gate (hold to power) [done]
 right trigger: intake (hold to power) [done]
 up-down dpad: scissor lift (0.1 increase every time per loop (10x per sec)) [done]
+
+
+control hub:
+    servo 2: hood
+
+expansion hub:
